@@ -33,16 +33,12 @@ def getPrefrences()
         {
             input name: "ringUser", type: "text", title: "Ring.com Useranme", description: "Enter username", required: true
             input name: "ringPassword", type: "password", title: "Ring.com Password", description: "Enter password", required: true
+            input name: "doorBellId", type: "text", title: "Doorbot ID", description: "Enter doorbot id", required: true
         }
 
         section("Zone 1 Switch")
         {
             input "zone1", "capability.switch"
-        }
-        
-        section("Disable motion zone in these modes.")
-        {
-            input "disabledModes", "mode", title: "Select the mode(s)", multiple: true, required: false
         }
         
         section( "Notifications" ) 
@@ -87,7 +83,6 @@ def initialize()
 {
     subscribe(zone1, "switch.on", enableMotion)
     subscribe(zone1, "switch.off", disableMotion)
-    log.debug "Subscribed!"
 }
 
 def enableMotion(evt)
@@ -106,7 +101,6 @@ def disableMotion(evt)
 
 def getAccessToken() 
 {
-    log.debug "Obtaining access token!"
     def params = [
         uri: "https://oauth.ring.com/oauth/token",
         contentType: "application/json",
@@ -125,7 +119,6 @@ def getAccessToken()
                 log.debug "${it.name} : ${it.value}"
             }
             state.accessToken = "${resp.data.access_token}"
-            log.debug "Access Token: $state.accessToken"
         }
     } catch (e) {
         log.debug "something went wrong: $e"
@@ -136,7 +129,8 @@ def enableZone()
 {
     log.debug "Enabling zone!"
     def params = [
-        uri: "https://api.ring.com/clients_api/doorbots/12753699",
+        uri: "https://api.ring.com/clients_api/doorbots/",
+        path: doorBellId,
         query: ['doorbot[description]':'Front Door', 'doorbot[settings][motion_zones][zone1][state]': '2'],
         contentType: "application/json",
         headers: [ Authorization : "Bearer $state.accessToken" ]
@@ -147,8 +141,6 @@ def enableZone()
             resp.headers.each {
                 log.debug "${it.name} : ${it.value}"
             }
-            log.debug "response data: ${resp.data}"
-            log.debug "Enabled Motion Zone 1"
         }
     } catch (e) {
         log.debug "something went wrong: $e"
@@ -159,7 +151,8 @@ def disableZone()
 {
     log.debug "Enabling zone!"
     def params = [
-        uri: "https://api.ring.com/clients_api/doorbots/12753699",
+        uri: "https://api.ring.com/clients_api/doorbots/",
+        path: doorBellId,
         query: ['doorbot[description]':'Front Door', 'doorbot[settings][motion_zones][zone1][state]': '0'],
         contentType: "application/json",
         headers: [ Authorization : "Bearer $state.accessToken" ]
@@ -170,7 +163,6 @@ def disableZone()
             resp.headers.each {
                 log.debug "${it.name} : ${it.value}"
             }
-            log.debug "response data: ${resp.data}"
             log.debug "Enabled Motion Zone 1"
         }
     } catch (e) {

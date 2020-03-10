@@ -31,8 +31,7 @@ def getPrefrences()
     {
         section("Provide your Ring.com credentials.)")
         {
-            input name: "ringUser", type: "text", title: "Ring.com Useranme", description: "Enter username", required: true
-            input name: "ringPassword", type: "password", title: "Ring.com Password", description: "Enter password", required: true
+            input name: "refreshToken", type: "password", title: "Ring Refresh Token", description: "Enter token", required: true
             input name: "doorBellId", type: "text", title: "Doorbot ID", description: "Enter doorbot id", required: true
         }
 
@@ -106,10 +105,9 @@ def getAccessToken()
         contentType: "application/json",
         body: [
             client_id: "ring_official_android",
-            grant_type: "password",
-            password: ringPassword,
+            grant_type: "refresh_token",
             scope: "client",
-            username: ringUser
+            refresh_token: refreshToken
         ]
     ]
 
@@ -194,7 +192,7 @@ private def textAppName()
 
 private def textVersion() 
 {
-    def text = "Version 1.0 (3/4/19)"
+    def text = "Version 1.1 (3/10/20)"
 }
 
 private def textCopyright() 
